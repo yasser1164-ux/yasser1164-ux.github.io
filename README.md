@@ -17,8 +17,9 @@ img/          portrait and any future imagery
 
 ## Editing
 
-Change a file, commit to `main`, and the Pages workflow republishes in
-about a minute.
+Change a file and commit to `main`. GitHub Pages publishes this repo
+automatically because it is named `<username>.github.io` — no workflow
+needed. The site is live about a minute after each push.
 
 ## Themes
 
