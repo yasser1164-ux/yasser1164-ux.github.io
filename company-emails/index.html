@@ -322,7 +322,7 @@ function lockScreen() {
   $$("main section").forEach((s) => (s.hidden = true)); $("nav").hidden = true; $(".stamps").hidden = true;
   $("#lede").textContent = "Your addresses are locked, so only you can see them.";
   $("#banner").innerHTML = '<form class="lock" id="lockForm">'
-    + "<h2>Enter your password</h2><p>Use the password Claude gave you for this page.</p>"
+    + "<h2>Enter your password</h2><p>With Remember on this device ticked, you only do this once here.</p>"
     + '<input class="vh" type="text" name="username" autocomplete="username" value="Company Emails" tabindex="-1" aria-hidden="true">'
     + '<label class="vh" for="pw">Password</label><input id="pw" name="password" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" required>'
     + '<label class="chk"><input type="checkbox" id="remember" checked> Remember on this device</label>'
