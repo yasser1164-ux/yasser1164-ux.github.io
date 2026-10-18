@@ -125,6 +125,13 @@ footer p{margin:4px 0}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:6px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s}
 .toast.on{opacity:1}
+.ty{display:inline-block;font-size:12px;font-weight:700;font-stretch:85%;line-height:1.55;padding:0 7px;border-radius:3px;margin-right:9px;background:var(--slate-wash);color:var(--slate);vertical-align:1px}
+.ty.hire{background:var(--blue-wash);color:var(--blue)}
+.ty.sys{background:var(--red-wash);color:var(--red)}
+.ind b{font-weight:600;color:var(--ink)}
+tr.sec td{font-weight:700;background:var(--slate-wash);border-bottom-color:var(--rule)}
+tr.sec td:first-child{font-stretch:85%;font-size:16px}
+td.indn{padding-left:22px}
 @media (max-width:640px){
   .wrap{padding-left:16px;padding-right:16px}
   h1{font-size:38px}
@@ -172,10 +179,11 @@ footer p{margin:4px 0}
     <div class="tools">
       <label class="vh" for="q">Search addresses</label>
       <input id="q" type="search" placeholder="Search address, company or note" autocomplete="off">
-      <label class="vh" for="ind">Industry</label><select id="ind"></select>
+      <label class="vh" for="ind">Sector or industry</label><select id="ind"></select>
+      <label class="vh" for="ty">Address type</label><select id="ty"></select>
       <label class="vh" for="src">Where it came from</label><select id="src"></select>
       <label class="vh" for="sort">Order</label>
-      <select id="sort"><option value="co">Company A to Z</option><option value="added">Recently added</option><option value="sent">Recently sent</option></select>
+      <select id="sort"><option value="org">Sector, industry, company</option><option value="co">Company A to Z</option><option value="added">Recently added</option><option value="sent">Recently sent</option></select>
       <label class="chk"><input type="checkbox" id="apply"> Has an apply link</label>
     </div>
     <div class="bar">
@@ -191,17 +199,17 @@ footer p{margin:4px 0}
     <div class="tools">
       <label class="vh" for="cq">Search companies</label>
       <input id="cq" type="search" placeholder="Search company, web address or note" autocomplete="off">
-      <label class="vh" for="cind">Industry</label><select id="cind"></select>
+      <label class="vh" for="cind">Sector or industry</label><select id="cind"></select>
       <label class="vh" for="csort">Order</label>
-      <select id="csort"><option value="name">Name A to Z</option><option value="n">Most to send</option><option value="all">Most addresses</option><option value="last">Recently sent</option></select>
+      <select id="csort"><option value="org">Sector and industry</option><option value="name">Name A to Z</option><option value="n">Most to send</option><option value="all">Most addresses</option><option value="last">Recently sent</option></select>
     </div>
     <div class="bar"><span class="count" id="ccount"></span></div>
     <div id="colist"></div>
     <button class="btn more" id="cmore" hidden>Show more</button>
   </section>
   <section id="v-inds" hidden>
-    <div class="bar"><span class="count">Industries</span><span class="hint">Choose an industry to see its addresses.</span></div>
-    <table><thead><tr><th>Industry</th><th class="hide-s">Companies</th><th>Addresses</th><th>To send</th><th class="hide-s">Sent</th><th class="hide-s">Bounced</th><th class="hide-s"><span class="vh">Share</span></th></tr></thead><tbody id="indbody"></tbody></table>
+    <div class="bar"><span class="count">Industries</span><span class="hint">Choose a sector or an industry to see its addresses.</span></div>
+    <table><thead><tr><th>Sector and industry</th><th class="hide-s">Companies</th><th>Addresses</th><th>To send</th><th class="hide-s">Sent</th><th class="hide-s">Bounced</th><th class="hide-s"><span class="vh">Share</span></th></tr></thead><tbody id="indbody"></tbody></table>
   </section>
   <section id="v-check" class="check" hidden>
     <p>Paste anything with email addresses in it: a job post, a list, a whole email. You'll see which ones are new and which you already have.</p>
@@ -236,41 +244,53 @@ function keyOf(email) {
 }
 const UNK = "Other / Unknown";
 const ST = { n: "To send", s: "Sent", b: "Bounced" };
+const TYPES = ["HR", "Recruitment", "Hiring contact", "Management", "Person", "General", "Other department", "System"];
+const HIRE = new Set(["HR", "Recruitment", "Hiring contact", "Management"]);
+const typeRank = (t) => { const i = TYPES.indexOf(t); return i < 0 ? 99 : i; };
 const coll = new Intl.Collator("en", { sensitivity: "base", numeric: true });
-const DB = { recs: [], byEmail: new Map(), cos: new Map(), coList: [], inds: [] };
+const DB = { recs: [], byEmail: new Map(), cos: new Map(), coList: [], inds: [], secOf: new Map(), indOrder: [], sectors: [] };
+const secOf = (ind) => DB.secOf.get(ind) || "Unknown";
+const secRank = (s) => { const i = DB.sectors.indexOf(s); return i < 0 ? 98 : i; };
+const indRank = (ind) => { const i = DB.indOrder.indexOf(ind); return i < 0 ? 98 : i; };
 const KEYSTORE = "company-emails-key";
-const KEY = "company-emails-viewer";
-let S = { tab: "addr", q: "", st: "", ind: "", src: "", co: "", apply: false, sort: "co", cq: "", cind: "", csort: "name", shown: 150, cshown: 120 };
+const KEY = "company-emails-viewer-2";
+let S = { tab: "addr", q: "", st: "", ind: "", ty: "", src: "", co: "", apply: false, sort: "org", cq: "", cind: "", csort: "org", shown: 150, cshown: 120 };
 try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || "{}"), { shown: 150, cshown: 120, co: "" }); } catch (e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 
 /* ---------- loading ---------- */
 function fromParts(idx, parts) {
-  const D = idx.dates, recs = [], cos = new Map();
+  const D = idx.dates, recs = [], cos = new Map(), v3 = idx.v >= 3;
+  const order = { sectors: v3 ? idx.sectors : [], ind: idx.ind, secOf: new Map(v3 ? idx.ind.map((x, i) => [x, idx.sectors[idx.isec[i]]]) : []) };
   for (const n of Object.keys(parts)) for (const g of parts[n]) {
     const [key, ems, name, web, ind, sure, tag] = g;
     const co = name
       ? { key, name, web: web || "", ind: idx.ind[ind || 0], sure: idx.sure[sure || 0], tag: typeof tag === "number" ? idx.tag[tag - 1] : (tag || ""), personal: false }
       : { key, name: "Personal email", web: "", ind: UNK, sure: "", tag: "", personal: true };
     cos.set(key, co);
-    for (const e of ems) {
-      const [lo, st, nt, src, frm, po, ad, fi, la, rs, ap] = e;
-      recs.push({ email: lo.includes("@") ? lo + "." + key : lo + "@" + key, st, co,
+    for (const e0 of ems) {
+      const e = v3 ? e0 : [e0[0], e0[1], null].concat(e0.slice(2));
+      const [lo, st, ty, nt, src, frm, po, ad, fi, la, rs, ap] = e;
+      recs.push({ email: lo.includes("@") ? lo + "." + key : lo + "@" + key, st, co, ty: v3 ? idx.types[ty || 0] || "" : "",
         note: Array.isArray(nt) ? nt[0] + " · " + idx.sect[nt[1]] : (nt || ""), src: idx.src[src || 0] || "", frm: idx.frm[frm || 0] || "",
         posted: po ? D[po - 1] : "", added: ad ? D[ad - 1] : "", first: fi ? D[fi - 1] : "", last: la ? D[la - 1] : "",
         rsn: rs ? idx.rsn[rs - 1] : "", apply: ap || "" });
     }
   }
-  return { recs, cos };
+  return { recs, cos, order };
 }
 function useData(d, note) {
   DB.ready = true; DB.recs = d.recs; DB.cos = d.cos;
+  const o = d.order || { sectors: [], ind: [], secOf: new Map() };
+  DB.secOf = o.secOf; DB.sectors = o.sectors.slice(); DB.indOrder = o.ind.slice();
+  for (const r of d.recs) { if (!DB.indOrder.includes(r.co.ind)) DB.indOrder.push(r.co.ind); const sc = secOf(r.co.ind); if (!DB.sectors.includes(sc)) DB.sectors.push(sc); }
   DB.byEmail = new Map(d.recs.map((r) => [r.email.toLowerCase(), r]));
   for (const c of d.cos.values()) { c.n = 0; c.s = 0; c.b = 0; c.last = ""; }
   for (const r of d.recs) {
     const c = r.co; c[r.st]++;
     if (r.st !== "n" && r.last > c.last) c.last = r.last;
-    r.hay = (r.email + " " + c.name + " " + c.key + " " + r.note + " " + r.frm + " " + c.ind + " " + c.tag).toLowerCase();
+    r.sec = secOf(c.ind);
+    r.hay = (r.email + " " + c.name + " " + c.key + " " + r.note + " " + r.frm + " " + c.ind + " " + r.sec + " " + r.ty + " " + c.tag).toLowerCase();
     r.ck = c.personal ? "Personal email" : c.name;
   }
   DB.coList = [...d.cos.values()].filter((c) => !c.personal && c.n + c.s + c.b > 0).sort((a, b) => coll.compare(a.name, b.name));
@@ -280,13 +300,26 @@ function useData(d, note) {
     if (!t) inds.set(r.co.ind, (t = { ind: r.co.ind, cos: new Set(), all: 0, n: 0, s: 0, b: 0 }));
     t.cos.add(r.co.key); t.all++; t[r.st]++;
   }
-  DB.inds = [...inds.values()].sort((a, b) => (a.ind === UNK) - (b.ind === UNK) || b.all - a.all || coll.compare(a.ind, b.ind));
+  DB.inds = [...inds.values()].sort((a, b) => secRank(secOf(a.ind)) - secRank(secOf(b.ind)) || indRank(a.ind) - indRank(b.ind) || coll.compare(a.ind, b.ind));
   const tot = { n: 0, s: 0, b: 0 }; for (const r of d.recs) tot[r.st]++;
   $("#c-n").textContent = fmt(tot.n); $("#c-s").textContent = fmt(tot.s); $("#c-b").textContent = fmt(tot.b);
   $("#lede").textContent = fmt(d.recs.length) + " addresses at " + fmt(DB.coList.length) + " companies from your job search. " + note;
   const opts = (sel, list, first) => { sel.innerHTML = '<option value="">' + first + "</option>" + list.map((v) => '<option value="' + esc(v) + '">' + esc(v) + "</option>").join(""); };
-  const indNames = DB.inds.map((t) => t.ind).sort((a, b) => (a === UNK) - (b === UNK) || coll.compare(a, b));
-  opts($("#ind"), indNames, "All industries"); opts($("#cind"), indNames, "All industries");
+  const grouped = (sel) => {
+    let h = '<option value="">All sectors and industries</option>';
+    for (const sc of DB.sectors) {
+      const list = DB.inds.filter((t) => secOf(t.ind) === sc);
+      if (!list.length) continue;
+      h += '<optgroup label="' + esc(sc) + '"><option value="' + esc("s:" + sc) + '">All of ' + esc(sc) + "</option>"
+        + list.map((t) => '<option value="' + esc(t.ind) + '">' + esc(t.ind) + "</option>").join("") + "</optgroup>";
+    }
+    sel.innerHTML = h;
+  };
+  grouped($("#ind")); grouped($("#cind"));
+  const tcount = new Map(); for (const r of d.recs) tcount.set(r.ty, (tcount.get(r.ty) || 0) + 1);
+  const tys = TYPES.filter((t) => tcount.has(t)).concat([...tcount.keys()].filter((t) => t && !TYPES.includes(t)));
+  $("#ty").innerHTML = '<option value="">All address types</option>' + tys.map((t) => '<option value="' + esc(t) + '">' + esc(t) + " (" + fmt(tcount.get(t)) + ")</option>").join("");
+  $("#ty").hidden = !tys.length;
   opts($("#src"), [...new Set(d.recs.map((r) => r.src).filter(Boolean))].sort(), "Any source");
   syncControls(); render();
 }
@@ -359,7 +392,7 @@ $("#lockBtn").onclick = () => { try { localStorage.removeItem(KEYSTORE); } catch
 
 /* ---------- views ---------- */
 function syncControls() {
-  $("#q").value = S.q; $("#ind").value = S.ind; $("#src").value = S.src; $("#sort").value = S.sort; $("#apply").checked = S.apply;
+  $("#q").value = S.q; $("#ind").value = S.ind; $("#ty").value = S.ty; $("#src").value = S.src; $("#sort").value = S.sort; $("#apply").checked = S.apply;
   $("#cq").value = S.cq; $("#cind").value = S.cind; $("#csort").value = S.csort;
 }
 function render() {
@@ -372,13 +405,20 @@ function render() {
 }
 function filtered() {
   const terms = S.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
-  const a = DB.recs.filter((r) => (!S.st || r.st === S.st) && (!S.ind || r.co.ind === S.ind) && (!S.src || r.src === S.src)
+  const a = DB.recs.filter((r) => (!S.st || r.st === S.st) && inSel(r.co.ind, S.ind) && (!S.ty || r.ty === S.ty) && (!S.src || r.src === S.src)
     && (!S.co || r.co.key === S.co) && (!S.apply || r.apply) && terms.every((t) => r.hay.includes(t)));
   if (S.sort === "added") a.sort((x, y) => (y.added || "").localeCompare(x.added || "") || coll.compare(x.ck, y.ck));
   else if (S.sort === "sent") a.sort((x, y) => (y.last || "").localeCompare(x.last || "") || coll.compare(x.ck, y.ck));
-  else a.sort((x, y) => coll.compare(x.ck, y.ck) || x.email.localeCompare(y.email));
+  else if (S.sort === "co") a.sort((x, y) => coll.compare(x.ck, y.ck) || x.email.localeCompare(y.email));
+  else a.sort(organized);
   return a;
 }
+function inSel(ind, sel) { return !sel || (sel.startsWith("s:") ? secOf(ind) === sel.slice(2) : ind === sel); }
+function organized(x, y) {
+  return secRank(x.sec) - secRank(y.sec) || indRank(x.co.ind) - indRank(y.co.ind) || (x.co.personal - y.co.personal)
+    || coll.compare(x.ck, y.ck) || typeRank(x.ty) - typeRank(y.ty) || x.email.localeCompare(y.email);
+}
+const selLabel = (sel) => (sel.startsWith("s:") ? sel.slice(2) : sel);
 const gmail = (e) => "https://mail.google.com/mail/u/0/#search/" + encodeURIComponent('"' + e + '"');
 function stamp(r) {
   if (r.st === "s") return '<div class="sm pm" title="Sent ' + esc(day(r.last)) + '">Sent<small>' + esc(shortDay(r.last)) + "</small></div>";
@@ -403,7 +443,8 @@ function rowHTML(r) {
     + '<button data-copy="' + esc(r.email) + '">Copy</button><a href="mailto:' + esc(r.email) + '">Email</a>'
     + '<a href="' + esc(gmail(r.email)) + '" target="_blank" rel="noopener">Find in Gmail</a>'
     + (r.apply ? '<a class="apply" href="' + esc(r.apply) + '" target="_blank" rel="noopener">Apply online</a>' : "") + "</span></div>"
-    + '<div class="co"><button class="linkbtn" data-co="' + esc(c.key) + '">' + esc(r.ck) + '</button><span class="ind">' + esc(c.ind) + "</span></div>"
+    + '<div class="co">' + (r.ty ? '<span class="ty' + (HIRE.has(r.ty) ? " hire" : r.ty === "System" ? " sys" : "") + '">' + esc(r.ty) + "</span>" : "")
+    + '<button class="linkbtn" data-co="' + esc(c.key) + '">' + esc(r.ck) + '</button><span class="ind">' + (r.sec && r.sec !== "Unknown" ? esc(r.sec) + " › " : "") + esc(c.ind) + "</span></div>"
     + (r.note ? '<p class="note" dir="auto">' + esc(r.note) + "</p>" : "")
     + '<p class="meta">' + meta(r) + "</p></div>" + stamp(r) + "</li>";
 }
@@ -414,7 +455,8 @@ function renderAddr() {
   const chips = [];
   if (S.co) { const c = DB.cos.get(S.co); chips.push(["co", c ? (c.personal ? "Personal email at " + c.key : c.name) : S.co]); }
   if (S.st) chips.push(["st", ST[S.st]]);
-  if (S.ind) chips.push(["ind", S.ind]);
+  if (S.ind) chips.push(["ind", selLabel(S.ind)]);
+  if (S.ty) chips.push(["ty", S.ty]);
   if (S.src) chips.push(["src", "From " + S.src]);
   if (S.apply) chips.push(["apply", "Has an apply link"]);
   if (S.q.trim()) chips.push(["q", "“" + S.q.trim() + "”"]);
@@ -436,13 +478,15 @@ function linkify(t) {
 }
 function renderCos() {
   const terms = S.cq.trim().toLowerCase().split(/\s+/).filter(Boolean);
-  let a = DB.coList.filter((c) => (!S.cind || c.ind === S.cind) && terms.every((t) => (c.name + " " + c.key + " " + c.web + " " + c.tag).toLowerCase().includes(t)));
+  let a = DB.coList.filter((c) => inSel(c.ind, S.cind) && terms.every((t) => (c.name + " " + c.key + " " + c.web + " " + c.tag + " " + c.ind + " " + secOf(c.ind)).toLowerCase().includes(t)));
+  if (S.csort === "org") a = a.slice().sort((x, y) => secRank(secOf(x.ind)) - secRank(secOf(y.ind)) || indRank(x.ind) - indRank(y.ind) || coll.compare(x.name, y.name));
   if (S.csort === "n") a = a.slice().sort((x, y) => y.n - x.n || coll.compare(x.name, y.name));
   else if (S.csort === "all") a = a.slice().sort((x, y) => y.n + y.s + y.b - (x.n + x.s + x.b) || coll.compare(x.name, y.name));
   else if (S.csort === "last") a = a.slice().sort((x, y) => (y.last || "").localeCompare(x.last || "") || coll.compare(x.name, y.name));
   $("#ccount").textContent = fmt(a.length) + (a.length === 1 ? " company" : " companies");
   $("#colist").innerHTML = a.length ? a.slice(0, S.cshown).map((c) => {
-    const indText = esc(c.ind) + (c.sure && c.ind !== UNK ? " (" + esc(c.sure.toLowerCase()) + ")" : "");
+    const sc = secOf(c.ind);
+    const indText = (sc !== "Unknown" ? esc(sc) + " › " : "") + esc(c.ind) + (c.sure && c.ind !== UNK ? " (" + esc(c.sure.toLowerCase()) + ")" : "");
     return '<div class="corow"><div><h3>' + esc(c.name) + '<span class="dom">' + esc(c.key) + "</span></h3>"
       + '<p class="meta">' + indText + (c.last ? ". Last sent " + esc(day(c.last)) : "") + "."
       + (c.web ? ' <a href="' + esc(/^https?:/i.test(c.web) ? c.web : "https://" + c.web) + '" target="_blank" rel="noopener">Website</a>' : "") + "</p>"
@@ -456,11 +500,19 @@ function renderCos() {
 }
 function renderInds() {
   const max = Math.max(1, ...DB.inds.map((t) => t.all));
-  $("#indbody").innerHTML = DB.inds.map((t) => {
-    const w = (v) => (100 * v / max).toFixed(2) + "%";
-    return '<tr data-ind="' + esc(t.ind) + '" tabindex="0"><td>' + esc(t.ind) + '</td><td class="hide-s">' + fmt(t.cos.size) + "</td><td>" + fmt(t.all) + "</td><td>" + fmt(t.n)
-      + '</td><td class="hide-s">' + fmt(t.s) + '</td><td class="hide-s">' + fmt(t.b) + '</td><td class="hide-s"><div class="stack" title="' + fmt(t.n) + " to send, " + fmt(t.s) + " sent, " + fmt(t.b) + ' bounced"><i class="s-n" style="width:' + w(t.n) + '"></i><i class="s-s" style="width:' + w(t.s) + '"></i><i class="s-b" style="width:' + w(t.b) + '"></i></div></td></tr>';
-  }).join("");
+  const w = (v) => (100 * v / max).toFixed(2) + "%";
+  const bar = (t) => '<div class="stack" title="' + fmt(t.n) + " to send, " + fmt(t.s) + " sent, " + fmt(t.b) + ' bounced"><i class="s-n" style="width:' + w(t.n) + '"></i><i class="s-s" style="width:' + w(t.s) + '"></i><i class="s-b" style="width:' + w(t.b) + '"></i></div>';
+  const row = (cls, key, label, t, cos) => '<tr class="' + cls + '" data-ind="' + esc(key) + '" tabindex="0"><td' + (cls === "ir" ? ' class="indn"' : "") + ">" + esc(label) + '</td><td class="hide-s">' + fmt(cos) + "</td><td>" + fmt(t.all) + "</td><td>" + fmt(t.n)
+    + '</td><td class="hide-s">' + fmt(t.s) + '</td><td class="hide-s">' + fmt(t.b) + '</td><td class="hide-s">' + (cls === "ir" ? bar(t) : "") + "</td></tr>";
+  let h = "";
+  for (const sc of DB.sectors) {
+    const list = DB.inds.filter((t) => secOf(t.ind) === sc);
+    if (!list.length) continue;
+    const tot = { all: 0, n: 0, s: 0, b: 0 }, cos = new Set();
+    for (const t of list) { tot.all += t.all; tot.n += t.n; tot.s += t.s; tot.b += t.b; t.cos.forEach((k) => cos.add(k)); }
+    h += row("sec", "s:" + sc, sc, tot, cos.size) + list.map((t) => row("ir", t.ind, t.ind, t, t.cos.size)).join("");
+  }
+  $("#indbody").innerHTML = h;
 }
 
 /* ---------- check addresses ---------- */
@@ -477,7 +529,7 @@ function doCheck() {
     const why = FREE.has(k) || (c && c.personal) ? "Personal email" : c ? c.name + " is in your lists: " + c.n + " to send, " + c.s + " sent, " + c.b + " bounced" : "A company that isn't in your lists yet";
     return '<li><span class="em">' + esc(e) + '</span><span class="why">' + esc(why) + "</span></li>";
   };
-  const known = (r) => '<li><span class="em">' + esc(r.email) + '</span><span class="why">' + esc(r.ck) + ". " + meta(r) + "</span></li>";
+  const known = (r) => '<li><span class="em">' + esc(r.email) + '</span><span class="why">' + esc(r.ck) + (r.ty ? " · " + esc(r.ty) : "") + ". " + meta(r) + "</span></li>";
   const msg = "Please add these new addresses to my Company Emails: " + g.x.join(", ");
   $("#res").innerHTML = '<p class="hint">Found ' + found.length + (found.length === 1 ? " address" : " different addresses") + ".</p>"
     + sec("New addresses", "Not in your lists yet." + (g.x.length ? ' <button class="linkbtn" data-copylist="' + esc(msg) + '">Copy a message asking Claude to add them</button>' : ""), g.x, newLi, g.x)
@@ -496,8 +548,8 @@ async function copy(text, what) {
 }
 function csvCell(v) { const s = String(v == null ? "" : v); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
 $("#dl").onclick = () => {
-  const head = ["Email", "Status", "Company", "Industry", "Job or note", "Source", "From", "Posted", "Added", "First sent", "Last sent", "Bounce reason", "Apply link"];
-  const rows = lastList.map((r) => [r.email, ST[r.st], r.ck, r.co.ind, r.note, r.src, r.frm, r.posted, r.added, r.st === "n" ? "" : r.first, r.st === "n" ? "" : r.last, r.rsn, r.apply]);
+  const head = ["Sector", "Industry", "Company", "Email", "Type", "Status", "Job or note", "Source", "From", "Posted", "Added", "First sent", "Last sent", "Bounce reason", "Apply link"];
+  const rows = lastList.map((r) => [r.sec, r.co.ind, r.ck, r.email, r.ty, ST[r.st], r.note, r.src, r.frm, r.posted, r.added, r.st === "n" ? "" : r.first, r.st === "n" ? "" : r.last, r.rsn, r.apply]);
   const text = String.fromCharCode(0xfeff) + [head].concat(rows).map((r) => r.map(csvCell).join(",")).join("\r\n") + "\r\n";
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([text], { type: "text/csv;charset=utf-8" }));
@@ -509,10 +561,10 @@ document.addEventListener("click", (ev) => {
   const t = ev.target.closest("button,tr[data-ind]"); if (!t) return;
   if (t.dataset.copy) copy(t.dataset.copy, t.dataset.copy);
   else if (t.dataset.copylist) copy(t.dataset.copylist, "to the clipboard");
-  else if (t.dataset.co) { S.co = t.dataset.co; S.tab = "addr"; S.st = ""; S.q = ""; S.ind = ""; S.src = ""; S.apply = false; S.shown = 150; syncControls(); render(); window.scrollTo(0, 0); }
+  else if (t.dataset.co) { S.co = t.dataset.co; S.tab = "addr"; S.st = ""; S.q = ""; S.ind = ""; S.ty = ""; S.src = ""; S.apply = false; S.shown = 150; syncControls(); render(); window.scrollTo(0, 0); }
   else if (t.dataset.clear) {
     const k = t.dataset.clear;
-    if (k === "all") Object.assign(S, { co: "", st: "", ind: "", src: "", apply: false, q: "" }); else S[k] = k === "apply" ? false : "";
+    if (k === "all") Object.assign(S, { co: "", st: "", ind: "", ty: "", src: "", apply: false, q: "" }); else S[k] = k === "apply" ? false : "";
     S.shown = 150; syncControls(); render();
   }
   else if (t.dataset.st) { S.st = S.tab === "addr" && S.st === t.dataset.st ? "" : t.dataset.st; S.tab = "addr"; S.shown = 150; render(); }
@@ -523,7 +575,7 @@ document.addEventListener("keydown", (ev) => { if (ev.key === "Enter" && ev.targ
 let qt;
 $("#q").oninput = () => { clearTimeout(qt); qt = setTimeout(() => { S.q = $("#q").value; S.shown = 150; renderAddr(); save(); }, 120); };
 $("#cq").oninput = () => { clearTimeout(qt); qt = setTimeout(() => { S.cq = $("#cq").value; S.cshown = 120; renderCos(); save(); }, 120); };
-for (const [id, k] of [["#ind", "ind"], ["#src", "src"], ["#sort", "sort"], ["#cind", "cind"], ["#csort", "csort"]])
+for (const [id, k] of [["#ind", "ind"], ["#ty", "ty"], ["#src", "src"], ["#sort", "sort"], ["#cind", "cind"], ["#csort", "csort"]])
   $(id).onchange = () => { S[k] = $(id).value; S.shown = 150; S.cshown = 120; render(); };
 $("#apply").onchange = () => { S.apply = $("#apply").checked; S.shown = 150; render(); };
 $("#more").onclick = () => { S.shown += 150; renderAddr(); };
