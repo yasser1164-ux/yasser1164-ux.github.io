@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Company Emails</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Noto+Sans+Arabic:wght@400;600&display=swap">
+<style>
+:root{
+  --paper:#F4F6FA;--surface:#FFFFFF;--ink:#16213B;--muted:#56637C;--faint:#8792A7;--rule:#DCE2EC;
+  --blue:#2452A4;--blue-wash:#E6ECF8;--red:#C0303C;--red-wash:#FBE8EA;--slate:#4A5770;--slate-wash:#ECEFF5;
+  --font:"Archivo","Noto Sans Arabic",system-ui,-apple-system,"Segoe UI",Roboto,Tahoma,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#0E1524;--surface:#141E32;--ink:#E6EBF4;--muted:#9EABC2;--faint:#73809A;--rule:#26324A;
+  --blue:#8CAEF3;--blue-wash:#1B2A4A;--red:#F1868E;--red-wash:#3A1D25;--slate:#B3BFD3;--slate-wash:#1F2A40;
+  color-scheme:dark;
+}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 15px/1.45 var(--font);}
+a{color:var(--blue)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+.edge{height:8px;background:repeating-linear-gradient(135deg,var(--red) 0 16px,transparent 16px 24px,var(--blue) 24px 40px,transparent 40px 48px)}
+header{background:var(--surface);border-bottom:1px solid var(--rule)}
+.hero{display:flex;gap:28px;align-items:flex-end;justify-content:space-between;padding-top:26px;padding-bottom:18px;flex-wrap:wrap}
+h1{margin:0;font-size:46px;line-height:1;font-weight:800;font-stretch:68%;letter-spacing:-.01em}
+.lede{margin:10px 0 0;color:var(--muted);max-width:52ch}
+.stamps{display:flex;gap:18px;align-items:center}
+.big{border:0;background:none;cursor:pointer;padding:0;color:inherit;text-align:center;position:relative}
+.big b{display:block;font-size:26px;line-height:1;font-weight:800;font-stretch:72%}
+.big span{display:block;font-size:13px;margin-top:3px}
+.big.ps{width:108px;height:84px;padding-top:16px;background:var(--blue-wash);color:var(--blue);border:4px dotted var(--surface);outline:2px solid var(--blue);outline-offset:-9px}
+.big.pm{width:92px;height:92px;border-radius:50%;border:4px double var(--slate);color:var(--slate);padding-top:24px;margin-right:30px}
+.big.pm::after{content:"";position:absolute;left:96px;top:30px;width:34px;height:26px;background:repeating-linear-gradient(to bottom,var(--slate) 0 2px,transparent 2px 7px);opacity:.45}
+.big.rt{width:110px;height:72px;padding-top:12px;border:3px solid var(--red);border-radius:8px;color:var(--red);transform:rotate(-5deg)}
+.big[aria-pressed="true"]{box-shadow:0 0 0 3px var(--paper),0 0 0 5px var(--ink)}
+.big.pm[aria-pressed="true"]{box-shadow:0 0 0 3px var(--paper),0 0 0 5px var(--ink)}
+@media (prefers-reduced-motion:no-preference){
+  .big{animation:thunk .5s cubic-bezier(.2,.9,.3,1.3) both}
+  .big.pm{animation-delay:.12s}.big.rt{animation-delay:.24s}
+  @keyframes thunk{from{opacity:0;transform:scale(1.25) rotate(4deg)}}
+  .big.rt{animation-name:thunk2}
+  @keyframes thunk2{from{opacity:0;transform:scale(1.25) rotate(2deg)}to{transform:rotate(-5deg)}}
+}
+nav{display:flex;gap:26px;overflow-x:auto}
+nav button{border:0;background:none;padding:10px 0 12px;cursor:pointer;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+#main{padding-top:22px;padding-bottom:60px}
+.banner{margin:0 0 16px;padding:10px 14px;border-left:4px solid var(--red);background:var(--red-wash)}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.tools input[type=search],.tools select,textarea{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:9px 11px}
+.tools input[type=search]{flex:1 1 260px;min-width:0;font-size:16px}
+.tools select{flex:0 1 auto;max-width:230px}
+.chk{display:flex;gap:6px;align-items:center;white-space:nowrap}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:16px 0 6px}
+.count{font-weight:700;font-stretch:80%;font-size:19px;margin-right:auto}
+.btn{border:1px solid var(--rule);background:var(--surface);border-radius:6px;padding:7px 12px;cursor:pointer;font-weight:600}
+.btn:hover{border-color:var(--ink)}
+.btn.main{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--ink);border-radius:20px;padding:2px 4px 2px 10px;font-size:13px}
+.chip button{border:0;background:none;cursor:pointer;padding:0 6px;font-size:15px;line-height:1}
+ul.list{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.env{display:grid;grid-template-columns:1fr 96px;gap:4px 18px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.addr{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline}
+.em{font-weight:650;font-size:17px;font-stretch:88%;word-break:break-all}
+.acts{display:flex;gap:12px;font-size:13px}
+.acts button,.linkbtn{border:0;background:none;padding:0;cursor:pointer;color:var(--blue);text-decoration:underline;text-underline-offset:2px}
+.acts a{text-underline-offset:2px}
+.co{margin-top:2px}
+.co .linkbtn{color:var(--ink);font-weight:600;text-decoration:none;text-align:left}
+.co .linkbtn:hover{text-decoration:underline}
+.ind{color:var(--muted);margin-left:8px;font-size:14px}
+.note{margin:4px 0 0;max-width:72ch;width:fit-content}
+.meta{margin:4px 0 0;color:var(--muted);font-size:13px}
+.apply{font-weight:700}
+.sm{justify-self:end;align-self:start;text-align:center;font-size:12px;font-weight:700;font-stretch:80%;line-height:1.15}
+.sm.ps{color:var(--blue);background:var(--blue-wash);padding:9px 8px;border:3px dotted var(--surface);outline:1.5px solid var(--blue);outline-offset:-6px;min-width:76px}
+.sm.pm{color:var(--slate);border:3px double var(--slate);border-radius:50%;width:66px;height:66px;display:flex;flex-direction:column;justify-content:center}
+.sm.pm small{display:block;font-weight:600;font-size:11px}
+.sm.rt{color:var(--red);border:2px solid var(--red);border-radius:5px;padding:6px 8px;transform:rotate(-5deg);margin-top:6px}
+.sm.rt small{display:block;font-weight:600;font-size:11px}
+.more{display:block;margin:18px auto 0}
+.empty{padding:40px 0;color:var(--muted);max-width:60ch}
+.empty h2{color:var(--ink);font-size:24px;font-stretch:75%;margin:0 0 8px}
+.corow{display:grid;grid-template-columns:1fr auto;gap:4px 18px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.corow h3{margin:0;font-size:18px;font-stretch:85%;font-weight:700}
+.dom{color:var(--muted);font-size:14px;margin-left:6px;font-weight:400}
+.tally{display:flex;gap:14px;font-size:13px;white-space:nowrap;align-self:start}
+.tally span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:0}
+.t-n::before{background:var(--blue)}.t-s::before{background:var(--slate)}.t-b::before{background:var(--red)}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:right;padding:10px 8px;border-bottom:1px solid var(--rule);font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font-size:13px;color:var(--muted);font-weight:600}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--slate-wash)}
+.stack{display:flex;height:10px;min-width:120px;border-radius:2px;overflow:hidden;background:var(--slate-wash)}
+.stack i{display:block}
+.s-n{background:var(--blue)}.s-s{background:var(--slate)}.s-b{background:var(--red)}
+.check textarea{width:100%;min-height:150px;resize:vertical;font-size:15px}
+.res h3{font-size:20px;font-stretch:80%;margin:26px 0 4px}
+.res p.hint{margin:0 0 8px;color:var(--muted)}
+.res ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.res li{padding:8px 0;border-bottom:1px solid var(--rule)}
+.res li .em{font-size:15px}
+.res li .why{color:var(--muted);font-size:13px;margin-left:10px}
+.lock{max-width:440px;margin:4px 0 40px;padding:22px 22px 24px;background:var(--surface);border:1px solid var(--rule);border-radius:8px}
+.lock h2{margin:0 0 4px;font-size:25px;font-stretch:75%}
+.lock p{margin:0 0 16px;color:var(--muted)}
+.lock input[type=password]{display:block;width:100%;background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:10px 12px;font-size:17px;margin:0 0 12px}
+.lock .err{color:var(--red);font-weight:600;margin:12px 0 0}
+.lock .err:empty{display:none}
+.lock .btn{margin-top:16px;padding:9px 20px}
+footer{border-top:1px solid var(--rule);color:var(--muted);font-size:13px;padding:18px 0 40px}
+footer p{margin:4px 0}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:6px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+@media (max-width:640px){
+  .wrap{padding-left:16px;padding-right:16px}
+  h1{font-size:38px}
+  .hero{align-items:flex-start}
+  .stamps{gap:12px}
+  .big b{font-size:22px}.big span{font-size:12px}
+  .big.ps{width:92px;height:72px;padding-top:13px}
+  .big.pm{width:78px;height:78px;padding-top:19px;margin-right:24px}
+  .big.pm::after{left:82px;top:26px;width:22px;height:24px}
+  .big.rt{width:92px;height:62px;padding-top:9px}
+  nav{gap:20px}
+  .tools select{max-width:100%;flex:1 1 140px}
+  .env{grid-template-columns:1fr 74px;gap:4px 10px}
+  .sm.pm{width:58px;height:58px}
+  .corow{grid-template-columns:1fr}
+  .hide-s{display:none}
+  th,td{padding:9px 5px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="edge" aria-hidden="true"></div>
+  <div class="wrap hero">
+    <div>
+      <h1>Company Emails</h1>
+      <p class="lede" id="lede">Loading your addresses…</p>
+    </div>
+    <div class="stamps" role="group" aria-label="Show addresses by status" hidden>
+      <button class="big ps" data-st="n" aria-pressed="false"><b id="c-n">–</b><span>to send</span></button>
+      <button class="big pm" data-st="s" aria-pressed="false"><b id="c-s">–</b><span>sent</span></button>
+      <button class="big rt" data-st="b" aria-pressed="false"><b id="c-b">–</b><span>bounced</span></button>
+    </div>
+  </div>
+  <nav class="wrap" role="tablist" aria-label="Views" hidden>
+    <button role="tab" data-tab="addr" aria-selected="true">Addresses</button>
+    <button role="tab" data-tab="cos" aria-selected="false">Companies</button>
+    <button role="tab" data-tab="inds" aria-selected="false">Industries</button>
+    <button role="tab" data-tab="check" aria-selected="false">Check<span class="hide-s"> addresses</span></button>
+  </nav>
+</header>
+<main class="wrap" id="main">
+  <div id="banner"></div>
+  <section id="v-addr" hidden>
+    <div class="tools">
+      <label class="vh" for="q">Search addresses</label>
+      <input id="q" type="search" placeholder="Search address, company or note" autocomplete="off">
+      <label class="vh" for="ind">Industry</label><select id="ind"></select>
+      <label class="vh" for="src">Where it came from</label><select id="src"></select>
+      <label class="vh" for="sort">Order</label>
+      <select id="sort"><option value="co">Company A to Z</option><option value="added">Recently added</option><option value="sent">Recently sent</option></select>
+      <label class="chk"><input type="checkbox" id="apply"> Has an apply link</label>
+    </div>
+    <div class="bar">
+      <span class="count" id="count"></span>
+      <span id="chips"></span>
+      <button class="btn" id="copyAll">Copy these addresses</button>
+      <button class="btn" id="dl">Download as CSV</button>
+    </div>
+    <ul class="list" id="list"></ul>
+    <button class="btn more" id="more" hidden>Show more</button>
+  </section>
+  <section id="v-cos" hidden>
+    <div class="tools">
+      <label class="vh" for="cq">Search companies</label>
+      <input id="cq" type="search" placeholder="Search company, web address or note" autocomplete="off">
+      <label class="vh" for="cind">Industry</label><select id="cind"></select>
+      <label class="vh" for="csort">Order</label>
+      <select id="csort"><option value="name">Name A to Z</option><option value="n">Most to send</option><option value="all">Most addresses</option><option value="last">Recently sent</option></select>
+    </div>
+    <div class="bar"><span class="count" id="ccount"></span></div>
+    <div id="colist"></div>
+    <button class="btn more" id="cmore" hidden>Show more</button>
+  </section>
+  <section id="v-inds" hidden>
+    <div class="bar"><span class="count">Industries</span><span class="hint">Choose an industry to see its addresses.</span></div>
+    <table><thead><tr><th>Industry</th><th class="hide-s">Companies</th><th>Addresses</th><th>To send</th><th class="hide-s">Sent</th><th class="hide-s">Bounced</th><th class="hide-s"><span class="vh">Share</span></th></tr></thead><tbody id="indbody"></tbody></table>
+  </section>
+  <section id="v-check" class="check" hidden>
+    <p>Paste anything with email addresses in it: a job post, a list, a whole email. You'll see which ones are new and which you already have.</p>
+    <label class="vh" for="paste">Text to check</label>
+    <textarea id="paste" placeholder="Paste a job post or a list of addresses here"></textarea>
+    <div class="bar"><button class="btn main" id="doCheck">Check addresses</button><button class="btn" id="clearCheck">Clear</button></div>
+    <div class="res" id="res"></div>
+  </section>
+</main>
+<footer class="wrap">
+  <p id="src-note"></p>
+  <p>To add addresses or mark them as sent, ask Claude in your Wmails Companies project. Then open this page again.</p>
+  <p><button class="linkbtn" id="lockBtn" hidden>Lock this page</button></p>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+"use strict";
+const $ = (s) => document.querySelector(s), $$ = (s) => [...document.querySelectorAll(s)];
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = (n) => Number(n).toLocaleString("en-US");
+const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const day = (s) => { if (!s) return ""; const [y, m, d] = s.split("-"); return +d + " " + MON[+m - 1] + " " + y; };
+const shortDay = (s) => { if (!s) return ""; const [y, m, d] = s.split("-"); return +d + " " + MON[+m - 1] + " " + y.slice(2); };
+const FREE = new Set(["gmail.com", "hotmail.com", "yahoo.com", "outlook.com", "live.com", "icloud.com", "mail.com", "ymail.com", "msn.com", "aol.com", "hotmail.co.uk", "yahoo.co.uk", "outlook.sa", "googlemail.com", "protonmail.com", "rocketmail.com", "gmx.com", "yandex.com", "zoho.com", "windowslive.com", "qmail.com"]);
+const SLD = new Set(["com", "co", "net", "org", "gov", "edu", "ac", "med", "sch", "sa"]);
+function keyOf(email) {
+  const d = String(email).slice(String(email).indexOf("@") + 1).toLowerCase();
+  if (FREE.has(d)) return d;
+  const p = d.split(".");
+  return p.length >= 3 && SLD.has(p[p.length - 2]) ? p.slice(-3).join(".") : p.slice(-2).join(".");
+}
+const UNK = "Other / Unknown";
+const ST = { n: "To send", s: "Sent", b: "Bounced" };
+const coll = new Intl.Collator("en", { sensitivity: "base", numeric: true });
+const DB = { recs: [], byEmail: new Map(), cos: new Map(), coList: [], inds: [] };
+const KEYSTORE = "company-emails-key";
+const KEY = "company-emails-viewer";
+let S = { tab: "addr", q: "", st: "", ind: "", src: "", co: "", apply: false, sort: "co", cq: "", cind: "", csort: "name", shown: 150, cshown: 120 };
+try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || "{}"), { shown: 150, cshown: 120, co: "" }); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+/* ---------- loading ---------- */
+function fromParts(idx, parts) {
+  const D = idx.dates, recs = [], cos = new Map();
+  for (const n of Object.keys(parts)) for (const g of parts[n]) {
+    const [key, ems, name, web, ind, sure, tag] = g;
+    const co = name
+      ? { key, name, web: web || "", ind: idx.ind[ind || 0], sure: idx.sure[sure || 0], tag: typeof tag === "number" ? idx.tag[tag - 1] : (tag || ""), personal: false }
+      : { key, name: "Personal email", web: "", ind: UNK, sure: "", tag: "", personal: true };
+    cos.set(key, co);
+    for (const e of ems) {
+      const [lo, st, nt, src, frm, po, ad, fi, la, rs, ap] = e;
+      recs.push({ email: lo.includes("@") ? lo + "." + key : lo + "@" + key, st, co,
+        note: Array.isArray(nt) ? nt[0] + " · " + idx.sect[nt[1]] : (nt || ""), src: idx.src[src || 0] || "", frm: idx.frm[frm || 0] || "",
+        posted: po ? D[po - 1] : "", added: ad ? D[ad - 1] : "", first: fi ? D[fi - 1] : "", last: la ? D[la - 1] : "",
+        rsn: rs ? idx.rsn[rs - 1] : "", apply: ap || "" });
+    }
+  }
+  return { recs, cos };
+}
+function useData(d, note) {
+  DB.ready = true; DB.recs = d.recs; DB.cos = d.cos;
+  DB.byEmail = new Map(d.recs.map((r) => [r.email.toLowerCase(), r]));
+  for (const c of d.cos.values()) { c.n = 0; c.s = 0; c.b = 0; c.last = ""; }
+  for (const r of d.recs) {
+    const c = r.co; c[r.st]++;
+    if (r.st !== "n" && r.last > c.last) c.last = r.last;
+    r.hay = (r.email + " " + c.name + " " + c.key + " " + r.note + " " + r.frm + " " + c.ind + " " + c.tag).toLowerCase();
+    r.ck = c.personal ? "Personal email" : c.name;
+  }
+  DB.coList = [...d.cos.values()].filter((c) => !c.personal && c.n + c.s + c.b > 0).sort((a, b) => coll.compare(a.name, b.name));
+  const inds = new Map();
+  for (const r of d.recs) {
+    let t = inds.get(r.co.ind);
+    if (!t) inds.set(r.co.ind, (t = { ind: r.co.ind, cos: new Set(), all: 0, n: 0, s: 0, b: 0 }));
+    t.cos.add(r.co.key); t.all++; t[r.st]++;
+  }
+  DB.inds = [...inds.values()].sort((a, b) => (a.ind === UNK) - (b.ind === UNK) || b.all - a.all || coll.compare(a.ind, b.ind));
+  const tot = { n: 0, s: 0, b: 0 }; for (const r of d.recs) tot[r.st]++;
+  $("#c-n").textContent = fmt(tot.n); $("#c-s").textContent = fmt(tot.s); $("#c-b").textContent = fmt(tot.b);
+  $("#lede").textContent = fmt(d.recs.length) + " addresses at " + fmt(DB.coList.length) + " companies from your job search. " + note;
+  const opts = (sel, list, first) => { sel.innerHTML = '<option value="">' + first + "</option>" + list.map((v) => '<option value="' + esc(v) + '">' + esc(v) + "</option>").join(""); };
+  const indNames = DB.inds.map((t) => t.ind).sort((a, b) => (a === UNK) - (b === UNK) || coll.compare(a, b));
+  opts($("#ind"), indNames, "All industries"); opts($("#cind"), indNames, "All industries");
+  opts($("#src"), [...new Set(d.recs.map((r) => r.src).filter(Boolean))].sort(), "Any source");
+  syncControls(); render();
+}
+const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+function b64of(buf) { const a = new Uint8Array(buf); let s = ""; for (let i = 0; i < a.length; i += 32768) s += String.fromCharCode.apply(null, a.subarray(i, i + 32768)); return btoa(s); }
+let LOCK = null, BOX = null;
+async function getJSON(f) { const r = await fetch(f, { cache: "no-cache" }); if (!r.ok) throw new Error(f + ": " + r.status); return r.json(); }
+async function unlockKey(pw) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);
+  const kek = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: b64(LOCK.salt), iterations: LOCK.iter, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+  return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(LOCK.iv) }, kek, b64(LOCK.priv));
+}
+async function openBox(pkcs8) {
+  const priv = await crypto.subtle.importKey("pkcs8", pkcs8, { name: "RSA-OAEP", hash: "SHA-256" }, false, ["decrypt"]);
+  const dek = await crypto.subtle.decrypt({ name: "RSA-OAEP" }, priv, b64(BOX.key));
+  const key = await crypto.subtle.importKey("raw", dek, "AES-GCM", false, ["decrypt"]);
+  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(BOX.iv) }, key, b64(BOX.data))));
+}
+function message(title, text) {
+  $("#lede").textContent = "";
+  $$("main section").forEach((s) => (s.hidden = true));
+  $("#banner").innerHTML = '<div class="empty"><h2>' + esc(title) + "</h2><p>" + esc(text) + "</p></div>";
+}
+function opened(box) {
+  const idx = box.index, d = fromParts(idx, box.parts);
+  const upd = idx.updated ? "Updated " + day(idx.updated.slice(0, 10)) + " at " + idx.updated.slice(11, 16) + "." : "";
+  $("#banner").innerHTML = ""; $("nav").hidden = false; $(".stamps").hidden = false; $("#lockBtn").hidden = false;
+  useData(d, upd);
+  $("#src-note").textContent = "Your addresses are kept locked and only open here, on your device. " + upd;
+  if (d.recs.length !== idx.emails) $("#banner").innerHTML = '<p class="banner">Some of the data didn’t load, so the lists may be incomplete. Reload the page to try again.</p>';
+}
+function lockScreen() {
+  $$("main section").forEach((s) => (s.hidden = true)); $("nav").hidden = true; $(".stamps").hidden = true;
+  $("#lede").textContent = "Your addresses are locked, so only you can see them.";
+  $("#banner").innerHTML = '<form class="lock" id="lockForm">'
+    + "<h2>Enter your password</h2><p>Use the password Claude gave you for this page.</p>"
+    + '<input class="vh" type="text" name="username" autocomplete="username" value="Company Emails" tabindex="-1" aria-hidden="true">'
+    + '<label class="vh" for="pw">Password</label><input id="pw" name="password" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false" required>'
+    + '<label class="chk"><input type="checkbox" id="remember" checked> Remember on this device</label>'
+    + '<p class="err" id="pwErr" role="alert"></p><button class="btn main" id="pwGo">Open</button></form>';
+  const go = $("#pwGo"), err = $("#pwErr");
+  $("#lockForm").onsubmit = async (ev) => {
+    ev.preventDefault();
+    const pw = $("#pw").value.trim(); if (!pw) return;
+    go.disabled = true; go.textContent = "Opening…"; err.textContent = "";
+    let pkcs8;
+    try { pkcs8 = await unlockKey(pw); } catch (e) {
+      go.disabled = false; go.textContent = "Open"; err.textContent = "That password didn’t work. Check it and try again."; $("#pw").select(); return;
+    }
+    try {
+      const box = await openBox(pkcs8);
+      if ($("#remember").checked) { try { localStorage.setItem(KEYSTORE, b64of(pkcs8)); } catch (e) {} }
+      opened(box);
+    } catch (e) { go.disabled = false; go.textContent = "Open"; err.textContent = "The password is right, but the data didn’t open. Ask Claude to update this page."; }
+  };
+  setTimeout(() => $("#pw").focus(), 60);
+}
+async function boot() {
+  if (!(window.crypto && crypto.subtle)) { message("This browser can’t open the page", "Open the link in Chrome, Safari or Edge."); return; }
+  try { [LOCK, BOX] = await Promise.all([getJSON("key.json"), getJSON("data.json")]); }
+  catch (e) { message("Your addresses didn’t load", "Check your internet connection, then reload the page."); return; }
+  let saved = null; try { saved = localStorage.getItem(KEYSTORE); } catch (e) {}
+  if (saved) {
+    try { opened(await openBox(b64(saved))); return; }
+    catch (e) { try { localStorage.removeItem(KEYSTORE); } catch (x) {} }
+  }
+  lockScreen();
+}
+$("#lockBtn").onclick = () => { try { localStorage.removeItem(KEYSTORE); } catch (e) {} location.reload(); };
+
+/* ---------- views ---------- */
+function syncControls() {
+  $("#q").value = S.q; $("#ind").value = S.ind; $("#src").value = S.src; $("#sort").value = S.sort; $("#apply").checked = S.apply;
+  $("#cq").value = S.cq; $("#cind").value = S.cind; $("#csort").value = S.csort;
+}
+function render() {
+  if (!DB.ready) return;
+  $$("nav button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === S.tab)));
+  $$("main section").forEach((s) => (s.hidden = s.id !== "v-" + S.tab));
+  $$(".big").forEach((b) => b.setAttribute("aria-pressed", String(S.tab === "addr" && S.st === b.dataset.st)));
+  if (S.tab === "addr") renderAddr(); else if (S.tab === "cos") renderCos(); else if (S.tab === "inds") renderInds();
+  save();
+}
+function filtered() {
+  const terms = S.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const a = DB.recs.filter((r) => (!S.st || r.st === S.st) && (!S.ind || r.co.ind === S.ind) && (!S.src || r.src === S.src)
+    && (!S.co || r.co.key === S.co) && (!S.apply || r.apply) && terms.every((t) => r.hay.includes(t)));
+  if (S.sort === "added") a.sort((x, y) => (y.added || "").localeCompare(x.added || "") || coll.compare(x.ck, y.ck));
+  else if (S.sort === "sent") a.sort((x, y) => (y.last || "").localeCompare(x.last || "") || coll.compare(x.ck, y.ck));
+  else a.sort((x, y) => coll.compare(x.ck, y.ck) || x.email.localeCompare(y.email));
+  return a;
+}
+const gmail = (e) => "https://mail.google.com/mail/u/0/#search/" + encodeURIComponent('"' + e + '"');
+function stamp(r) {
+  if (r.st === "s") return '<div class="sm pm" title="Sent ' + esc(day(r.last)) + '">Sent<small>' + esc(shortDay(r.last)) + "</small></div>";
+  if (r.st === "b") return '<div class="sm rt" title="Bounced: ' + esc(r.rsn) + '">Bounced<small>' + esc(shortDay(r.last)) + "</small></div>";
+  return '<div class="sm ps">To send</div>';
+}
+function meta(r) {
+  const out = [];
+  if (r.st === "n") {
+    out.push((r.frm ? "From " + r.frm : r.src ? "From " + r.src : "Added") + (r.added ? ", added " + day(r.added) : ""));
+    if (r.posted) out.push("Posted " + day(r.posted));
+  } else {
+    if (r.first && r.first !== r.last) out.push("First sent " + day(r.first) + ", last sent " + day(r.last));
+    else if (r.last) out.push("Sent " + day(r.last));
+    if (r.st === "b") out.push("Bounced: " + (r.rsn || "reason not recorded"));
+  }
+  return out.map(esc).join(". ") + (out.length ? "." : "");
+}
+function rowHTML(r) {
+  const c = r.co;
+  return '<li class="env"><div><div class="addr"><span class="em">' + esc(r.email) + '</span><span class="acts">'
+    + '<button data-copy="' + esc(r.email) + '">Copy</button><a href="mailto:' + esc(r.email) + '">Email</a>'
+    + '<a href="' + esc(gmail(r.email)) + '" target="_blank" rel="noopener">Find in Gmail</a>'
+    + (r.apply ? '<a class="apply" href="' + esc(r.apply) + '" target="_blank" rel="noopener">Apply online</a>' : "") + "</span></div>"
+    + '<div class="co"><button class="linkbtn" data-co="' + esc(c.key) + '">' + esc(r.ck) + '</button><span class="ind">' + esc(c.ind) + "</span></div>"
+    + (r.note ? '<p class="note" dir="auto">' + esc(r.note) + "</p>" : "")
+    + '<p class="meta">' + meta(r) + "</p></div>" + stamp(r) + "</li>";
+}
+let lastList = [];
+function renderAddr() {
+  const a = (lastList = filtered());
+  $("#count").textContent = fmt(a.length) + (a.length === 1 ? " address" : " addresses");
+  const chips = [];
+  if (S.co) { const c = DB.cos.get(S.co); chips.push(["co", c ? (c.personal ? "Personal email at " + c.key : c.name) : S.co]); }
+  if (S.st) chips.push(["st", ST[S.st]]);
+  if (S.ind) chips.push(["ind", S.ind]);
+  if (S.src) chips.push(["src", "From " + S.src]);
+  if (S.apply) chips.push(["apply", "Has an apply link"]);
+  if (S.q.trim()) chips.push(["q", "“" + S.q.trim() + "”"]);
+  $("#chips").innerHTML = chips.map(([k, v]) => '<span class="chip">' + esc(v) + '<button data-clear="' + k + '" aria-label="Remove filter ' + esc(v) + '">×</button></span>').join(" ")
+    + (chips.length > 1 ? ' <button class="linkbtn" data-clear="all">Clear all</button>' : "");
+  $("#copyAll").textContent = a.length ? "Copy " + (a.length === 1 ? "this address" : "these " + fmt(a.length) + " addresses") : "Copy these addresses";
+  $("#copyAll").disabled = $("#dl").disabled = !a.length;
+  $("#list").innerHTML = a.length ? a.slice(0, S.shown).map(rowHTML).join("")
+    : '<li class="empty">No addresses match. Try fewer words, or clear the filters.</li>';
+  const left = a.length - S.shown;
+  $("#more").hidden = left <= 0;
+  $("#more").textContent = "Show " + fmt(Math.min(left, 150)) + " more of " + fmt(left);
+}
+function linkify(t) {
+  return esc(t).replace(/https?:\/\/[^\s<>"')]+/g, (u) => {
+    let host = u; try { host = new URL(u.replace(/&amp;/g, "&")).hostname.replace(/^www\./, ""); } catch (e) {}
+    return '<a href="' + u + '" target="_blank" rel="noopener">' + esc(host) + "</a>";
+  });
+}
+function renderCos() {
+  const terms = S.cq.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  let a = DB.coList.filter((c) => (!S.cind || c.ind === S.cind) && terms.every((t) => (c.name + " " + c.key + " " + c.web + " " + c.tag).toLowerCase().includes(t)));
+  if (S.csort === "n") a = a.slice().sort((x, y) => y.n - x.n || coll.compare(x.name, y.name));
+  else if (S.csort === "all") a = a.slice().sort((x, y) => y.n + y.s + y.b - (x.n + x.s + x.b) || coll.compare(x.name, y.name));
+  else if (S.csort === "last") a = a.slice().sort((x, y) => (y.last || "").localeCompare(x.last || "") || coll.compare(x.name, y.name));
+  $("#ccount").textContent = fmt(a.length) + (a.length === 1 ? " company" : " companies");
+  $("#colist").innerHTML = a.length ? a.slice(0, S.cshown).map((c) => {
+    const indText = esc(c.ind) + (c.sure && c.ind !== UNK ? " (" + esc(c.sure.toLowerCase()) + ")" : "");
+    return '<div class="corow"><div><h3>' + esc(c.name) + '<span class="dom">' + esc(c.key) + "</span></h3>"
+      + '<p class="meta">' + indText + (c.last ? ". Last sent " + esc(day(c.last)) : "") + "."
+      + (c.web ? ' <a href="' + esc(/^https?:/i.test(c.web) ? c.web : "https://" + c.web) + '" target="_blank" rel="noopener">Website</a>' : "") + "</p>"
+      + (c.tag ? '<p class="note" dir="auto">' + linkify(c.tag) + "</p>" : "")
+      + '<p class="meta"><button class="linkbtn" data-co="' + esc(c.key) + '">Show its ' + (c.n + c.s + c.b === 1 ? "address" : fmt(c.n + c.s + c.b) + " addresses") + "</button></p></div>"
+      + '<div class="tally"><span class="t-n">' + c.n + ' to send</span><span class="t-s">' + c.s + ' sent</span><span class="t-b">' + c.b + " bounced</span></div></div>";
+  }).join("") : '<p class="empty">No companies match.</p>';
+  const left = a.length - S.cshown;
+  $("#cmore").hidden = left <= 0;
+  $("#cmore").textContent = "Show " + fmt(Math.min(left, 120)) + " more of " + fmt(left);
+}
+function renderInds() {
+  const max = Math.max(1, ...DB.inds.map((t) => t.all));
+  $("#indbody").innerHTML = DB.inds.map((t) => {
+    const w = (v) => (100 * v / max).toFixed(2) + "%";
+    return '<tr data-ind="' + esc(t.ind) + '" tabindex="0"><td>' + esc(t.ind) + '</td><td class="hide-s">' + fmt(t.cos.size) + "</td><td>" + fmt(t.all) + "</td><td>" + fmt(t.n)
+      + '</td><td class="hide-s">' + fmt(t.s) + '</td><td class="hide-s">' + fmt(t.b) + '</td><td class="hide-s"><div class="stack" title="' + fmt(t.n) + " to send, " + fmt(t.s) + " sent, " + fmt(t.b) + ' bounced"><i class="s-n" style="width:' + w(t.n) + '"></i><i class="s-s" style="width:' + w(t.s) + '"></i><i class="s-b" style="width:' + w(t.b) + '"></i></div></td></tr>';
+  }).join("");
+}
+
+/* ---------- check addresses ---------- */
+function doCheck() {
+  const text = $("#paste").value;
+  const found = [...new Set((text.match(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/g) || []).map((e) => e.replace(/\.+$/, "").toLowerCase()))];
+  if (!found.length) { $("#res").innerHTML = '<p class="hint">No email addresses found in that text.</p>'; return; }
+  const g = { x: [], n: [], s: [], b: [] };
+  for (const e of found) { const r = DB.byEmail.get(e); if (r) g[r.st].push(r); else g.x.push(e); }
+  const sec = (title, hint, items, li, copy) => items.length ? "<h3>" + title + " (" + items.length + ")</h3>" + (hint ? '<p class="hint">' + hint + "</p>" : "")
+    + (copy ? '<p><button class="btn" data-copylist="' + esc(copy.join(", ")) + '">Copy ' + (copy.length === 1 ? "it" : "these " + copy.length) + "</button></p>" : "") + "<ul>" + items.map(li).join("") + "</ul>" : "";
+  const newLi = (e) => {
+    const k = keyOf(e), c = DB.cos.get(k);
+    const why = FREE.has(k) || (c && c.personal) ? "Personal email" : c ? c.name + " is in your lists: " + c.n + " to send, " + c.s + " sent, " + c.b + " bounced" : "A company that isn't in your lists yet";
+    return '<li><span class="em">' + esc(e) + '</span><span class="why">' + esc(why) + "</span></li>";
+  };
+  const known = (r) => '<li><span class="em">' + esc(r.email) + '</span><span class="why">' + esc(r.ck) + ". " + meta(r) + "</span></li>";
+  const msg = "Please add these new addresses to my Company Emails: " + g.x.join(", ");
+  $("#res").innerHTML = '<p class="hint">Found ' + found.length + (found.length === 1 ? " address" : " different addresses") + ".</p>"
+    + sec("New addresses", "Not in your lists yet." + (g.x.length ? ' <button class="linkbtn" data-copylist="' + esc(msg) + '">Copy a message asking Claude to add them</button>' : ""), g.x, newLi, g.x)
+    + sec("Already in To send", "", g.n, known) + sec("Already sent", "", g.s, known) + sec("Bounced before", "", g.b, known);
+}
+$("#doCheck").onclick = doCheck;
+$("#clearCheck").onclick = () => { $("#paste").value = ""; $("#res").innerHTML = ""; $("#paste").focus(); };
+
+/* ---------- copy, download, events ---------- */
+let tt;
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => el.classList.remove("on"), 1800); }
+async function copy(text, what) {
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (x) {} ta.remove(); }
+  toast("Copied " + what);
+}
+function csvCell(v) { const s = String(v == null ? "" : v); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+$("#dl").onclick = () => {
+  const head = ["Email", "Status", "Company", "Industry", "Job or note", "Source", "From", "Posted", "Added", "First sent", "Last sent", "Bounce reason", "Apply link"];
+  const rows = lastList.map((r) => [r.email, ST[r.st], r.ck, r.co.ind, r.note, r.src, r.frm, r.posted, r.added, r.st === "n" ? "" : r.first, r.st === "n" ? "" : r.last, r.rsn, r.apply]);
+  const text = String.fromCharCode(0xfeff) + [head].concat(rows).map((r) => r.map(csvCell).join(",")).join("\r\n") + "\r\n";
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type: "text/csv;charset=utf-8" }));
+  a.download = "Company emails (" + fmt(rows.length) + ").csv";
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+};
+$("#copyAll").onclick = () => copy(lastList.map((r) => r.email).join(", "), lastList.length === 1 ? "1 address" : fmt(lastList.length) + " addresses");
+document.addEventListener("click", (ev) => {
+  const t = ev.target.closest("button,tr[data-ind]"); if (!t) return;
+  if (t.dataset.copy) copy(t.dataset.copy, t.dataset.copy);
+  else if (t.dataset.copylist) copy(t.dataset.copylist, "to the clipboard");
+  else if (t.dataset.co) { S.co = t.dataset.co; S.tab = "addr"; S.st = ""; S.q = ""; S.ind = ""; S.src = ""; S.apply = false; S.shown = 150; syncControls(); render(); window.scrollTo(0, 0); }
+  else if (t.dataset.clear) {
+    const k = t.dataset.clear;
+    if (k === "all") Object.assign(S, { co: "", st: "", ind: "", src: "", apply: false, q: "" }); else S[k] = k === "apply" ? false : "";
+    S.shown = 150; syncControls(); render();
+  }
+  else if (t.dataset.st) { S.st = S.tab === "addr" && S.st === t.dataset.st ? "" : t.dataset.st; S.tab = "addr"; S.shown = 150; render(); }
+  else if (t.dataset.tab) { S.tab = t.dataset.tab; render(); }
+  else if (t.dataset.ind != null && t.tagName === "TR") { S.ind = t.dataset.ind; S.tab = "addr"; S.st = ""; S.co = ""; S.shown = 150; syncControls(); render(); window.scrollTo(0, 0); }
+});
+document.addEventListener("keydown", (ev) => { if (ev.key === "Enter" && ev.target.matches("tr[data-ind]")) ev.target.click(); });
+let qt;
+$("#q").oninput = () => { clearTimeout(qt); qt = setTimeout(() => { S.q = $("#q").value; S.shown = 150; renderAddr(); save(); }, 120); };
+$("#cq").oninput = () => { clearTimeout(qt); qt = setTimeout(() => { S.cq = $("#cq").value; S.cshown = 120; renderCos(); save(); }, 120); };
+for (const [id, k] of [["#ind", "ind"], ["#src", "src"], ["#sort", "sort"], ["#cind", "cind"], ["#csort", "csort"]])
+  $(id).onchange = () => { S[k] = $(id).value; S.shown = 150; S.cshown = 120; render(); };
+$("#apply").onchange = () => { S.apply = $("#apply").checked; S.shown = 150; render(); };
+$("#more").onclick = () => { S.shown += 150; renderAddr(); };
+$("#cmore").onclick = () => { S.cshown += 120; renderCos(); };
+$("#paste").addEventListener("keydown", (ev) => { if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) doCheck(); });
+boot();
+})();
+</script>
+</body>
+</html>
